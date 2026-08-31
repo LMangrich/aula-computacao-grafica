@@ -1,0 +1,26 @@
+# Compiled output
+bin/
+out/
+build/
+*.class
+
+# Eclipse / IDE
+.classpath
+.project
+.settings/
+.metadata/
+
+# IntelliJ
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Java
+*.log
+hs_err_pid*
