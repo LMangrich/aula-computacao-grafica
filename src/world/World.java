@@ -23,6 +23,7 @@ public class World {
 
 	private int timer = 0;
 	private final Random rand = new Random();
+	private boolean settingFirstPoint = true;
 
 	private final KeyboardInput keyboard;
 	private final MouseInput mouse;
@@ -57,12 +58,16 @@ public class World {
 			posx += vel * difS;
 		}
 
-		q1x += 0.2;
-
-		float dx = mouse.mouseX - q2x;
-		float dy = mouse.mouseY - q2y;
-		double ang = Math.atan2(dy, dx);
-		q2x = (float) (q2x + Math.cos(ang) * 100 * diftime / 1000.0f);
-		q2y = (float) (q2y + Math.sin(ang) * 100 * diftime / 1000.0f);
+		// First click sets (x1,y1), next click sets (x2,y2), then it loops back.
+		if (mouse.consumeClick()) {
+			if (settingFirstPoint) {
+				q1x = mouse.clickX;
+				q1y = mouse.clickY;
+			} else {
+				q2x = mouse.clickX;
+				q2y = mouse.clickY;
+			}
+			settingFirstPoint = !settingFirstPoint;
+		}
 	}
 }
