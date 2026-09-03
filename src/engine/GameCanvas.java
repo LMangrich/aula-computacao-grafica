@@ -61,17 +61,10 @@ public class GameCanvas extends JPanel implements Runnable {
 		framebuffer.clear();
 		framebuffer.fill(255, 255, 255, 255);
 
-		for (int i = 0; i < 100; i++) {
-			int p0 = 50 * 4 + W * 4 * 100;
-			int pos = p0 + i * 4;
-			framebuffer.pixels[pos] = (byte) 255;
-			framebuffer.pixels[pos + 1] = (byte) 255;
-			framebuffer.pixels[pos + 2] = (byte) 0;
-			framebuffer.pixels[pos + 3] = (byte) 0;
-		}
+		// renderer.drawImage(sprite, (int) world.posx, (int) world.posy,
+		// 		world.filtroR, world.filtroG, world.filtroB);
 
-		renderer.drawImage(sprite, (int) world.posx, (int) world.posy,
-				world.filtroR, world.filtroG, world.filtroB);
+		renderer.drawLine((int) world.q1x, (int) world.q1y, (int) world.q2x, (int) world.q2y, 0, 0, 0);
 
 		g.setFont(font);
 

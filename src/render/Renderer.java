@@ -72,4 +72,33 @@ public class Renderer {
 			pospix += target.width * 4;
 		}
 	}
+	//Bresenham generalizado 
+	public void drawLine(int x1, int y1, int x2, int y2, int r, int g, int b) {
+		int dx = Math.abs(x2 - x1); // distancia horizontal
+		int dy = -Math.abs(y2 - y1); // distancia vertical
+		int sx = x1 < x2 ? 1 : -1; // direita ou esquerda
+		int sy = y1 < y2 ? 1 : -1; // baixo ou cima
+		int err = dx + dy; // erro inicial - a distância vertical entre a linha real e o pixel atual
+
+		int x = x1;
+		int y = y1;
+
+		while (true) {
+			target.setPixel(x, y, r, g, b);
+
+			if (x == x2 && y == y2) {
+				break;
+			}
+
+			int e2 = 2 * err; //dobra erro para evitar divisão e não perder precisão
+			if (e2 >= dy) { //avança em X, equivale a err >= dy/2
+				err += dy;
+				x += sx;
+			}
+			if (e2 <= dx) { //avança em Y, err <= dx/2
+				err += dx;
+				y += sy;
+			}
+		}
+	}
 }

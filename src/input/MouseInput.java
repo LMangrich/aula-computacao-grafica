@@ -14,11 +14,25 @@ public class MouseInput implements MouseListener, MouseMotionListener {
 	public int mouseX;
 	public int mouseY;
 
+	private boolean clicked;
+
 	@Override
 	public void mousePressed(MouseEvent e) {
 		clickX = e.getX();
 		clickY = e.getY();
+		clicked = true;
 		System.out.println("CLICO ");
+	}
+
+	/**
+	 * Returns true once for each click, then resets until the next one.
+	 */
+	public boolean consumeClick() {
+		if (clicked) {
+			clicked = false;
+			return true;
+		}
+		return false;
 	}
 
 	@Override
