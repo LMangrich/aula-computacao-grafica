@@ -16,7 +16,13 @@ See [DOCUMENTACAO.md](DOCUMENTACAO.md) for the architecture and every class/func
 
 JDK 8+; run from the project root.
 
-**Linux / macOS / Git Bash:**
+**Linux (Debian) / macOS:** run the script. It needs a full JDK with GUI support (`sudo apt install default-jdk`; the `-headless` package cannot open the window).
+
+```bash
+sh run.sh
+```
+
+Or by hand (also works in Git Bash):
 
 ```bash
 javac -d bin $(find src -name '*.java') && java -cp bin app.MainClass
