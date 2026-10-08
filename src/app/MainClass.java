@@ -16,9 +16,9 @@ public class MainClass {
 		GameCanvas meuCanvas = new GameCanvas(); //drawing surface
 
 		JFrame f = new JFrame(); // window shell -- botões principais close/minimize/etc
-		f.setSize(640, 480); // window size in pixels
-		f.setVisible(true); // faz aparecer na tela
 		f.getContentPane().add(meuCanvas); // adiciona o canvas na janela
+		f.pack(); // sizes the frame to fit the canvas's preferred size
+		f.setVisible(true); // faz aparecer na tela
 
 		f.addWindowListener(new WindowAdapter() {
 			@Override

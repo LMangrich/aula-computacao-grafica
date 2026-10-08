@@ -21,8 +21,8 @@ import scene.SceneObject;
  * normal and fills it through the z-buffer. Long-lived state lives in {@link Scene}.
  */
 public class GameCanvas extends JPanel implements Runnable {
-	private static final int W = 640;
-	private static final int H = 480;
+	private static final int W = 800;
+	private static final int H = 500;
 	private static final double D = 500; // projection plane distance
 	private static final double NEAR = 1; // minimum depth kept (w * D)
 
@@ -39,7 +39,6 @@ public class GameCanvas extends JPanel implements Runnable {
 	private final Matrix4 projection = Matrix4.perspective(D);
 
 	public GameCanvas() throws IOException {
-		setSize(W, H);
 		setFocusable(true);
 		addKeyListener(keyboard);
 
@@ -52,6 +51,11 @@ public class GameCanvas extends JPanel implements Runnable {
 		scene.add(new SceneObject(ObjLoader.load(ASSETS + "Mig_29_obj.obj"), 200, -200, 0.7, new int[] { 130, 150, 180 }));
 		scene.add(new SceneObject(ObjLoader.load(ASSETS + "Bench_LowRes.obj"), -200, 200, 0.8, new int[] { 160, 110, 70 }));
 		scene.add(new SceneObject(ObjLoader.load(ASSETS + "chair_01.obj"), 200, 200, 150, new int[] { 200, 80, 80 }));
+	}
+
+	@Override
+	public java.awt.Dimension getPreferredSize() {
+		return new java.awt.Dimension(W, H);
 	}
 
 	@Override
