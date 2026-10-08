@@ -42,4 +42,72 @@ public class Renderer {
 			}
 		}
 	}
+
+	/**
+	 * Same Bresenham walk, but every pixel is depth-tested: invW (1/w) is
+	 * interpolated linearly in screen space, which is exact for perspective.
+	 */
+	public void drawLine(int x1, int y1, double iw1, int x2, int y2, double iw2, int r, int g, int b) {
+		int dx = Math.abs(x2 - x1);
+		int dy = -Math.abs(y2 - y1);
+		int sx = x1 < x2 ? 1 : -1;
+		int sy = y1 < y2 ? 1 : -1;
+		int err = dx + dy;
+		int steps = Math.max(dx, -dy);
+
+		int x = x1;
+		int y = y1;
+		int n = 0;
+		while (true) {
+			double t = steps == 0 ? 0 : (double) n / steps;
+			target.setPixelDepth(x, y, iw1 + (iw2 - iw1) * t, r, g, b);
+			if (x == x2 && y == y2) {
+				break;
+			}
+			int e2 = 2 * err;
+			if (e2 >= dy) {
+				err += dy;
+				x += sx;
+			}
+			if (e2 <= dx) {
+				err += dx;
+				y += sy;
+			}
+			n++;
+		}
+	}
+
+	/**
+	 * Fills a triangle given in screen space. Every pixel centre inside the
+	 * bounding box is tested with edge functions (barycentric coordinates); inside
+	 * pixels get 1/w interpolated and go through the z-buffer, so nearer surfaces
+	 * hide farther ones regardless of drawing order.
+	 */
+	public void fillTriangle(double x0, double y0, double iw0, double x1, double y1, double iw1,
+			double x2, double y2, double iw2, int r, int g, int b) {
+		double area = (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
+		if (Math.abs(area) < 1e-9) {
+			return; // degenerate (seen edge-on)
+		}
+
+		int minX = Math.max(0, (int) Math.floor(Math.min(x0, Math.min(x1, x2))));
+		int maxX = Math.min(target.width - 1, (int) Math.ceil(Math.max(x0, Math.max(x1, x2))));
+		int minY = Math.max(0, (int) Math.floor(Math.min(y0, Math.min(y1, y2))));
+		int maxY = Math.min(target.height - 1, (int) Math.ceil(Math.max(y0, Math.max(y1, y2))));
+
+		for (int y = minY; y <= maxY; y++) {
+			double py = y + 0.5;
+			for (int x = minX; x <= maxX; x++) {
+				double px = x + 0.5;
+				// barycentric weights: how much of each vertex this pixel takes
+				double w0 = ((x1 - px) * (y2 - py) - (x2 - px) * (y1 - py)) / area;
+				double w1 = ((x2 - px) * (y0 - py) - (x0 - px) * (y2 - py)) / area;
+				double w2 = 1 - w0 - w1;
+				if (w0 < 0 || w1 < 0 || w2 < 0) {
+					continue; // pixel outside the triangle
+				}
+				target.setPixelDepth(x, y, w0 * iw0 + w1 * iw1 + w2 * iw2, r, g, b);
+			}
+		}
+	}
 }

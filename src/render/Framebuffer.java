@@ -12,6 +12,7 @@ public class Framebuffer {
 	public final int height;
 	public final BufferedImage image; // imagem que vai ser desenhada na tela, eh o que a jframe vai mostrar
 	public final byte[] pixels; // visão direta da imagem, para escrever diretamente na memoria de video
+	public final double[] depth; // z-buffer: 1/w por pixel (maior = mais perto da camera), 0 = vazio
 
 	public Framebuffer(int width, int height) {
 		this.width = width;
@@ -20,13 +21,31 @@ public class Framebuffer {
 		this.image = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
 		// pega a visão direta da imagem, para escrever diretamente na memoria de video
 		this.pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
+		this.depth = new double[width * height];
 	}
 
-	/** Fills the whole buffer with opaque white. */
+	/** Fills the whole buffer with opaque white and empties the z-buffer. */
 	public void clear() {
 		for (int i = 0; i < pixels.length; i++) {
 			pixels[i] = (byte) 255;
 		}
+		java.util.Arrays.fill(depth, 0);
+	}
+
+	/**
+	 * Depth-tested write: only draws if invW (1/w, larger = nearer) is nearer than
+	 * what is already stored at (x, y).
+	 */
+	public void setPixelDepth(int x, int y, double invW, int r, int g, int b) {
+		if (x < 0 || x >= width || y < 0 || y >= height) {
+			return;
+		}
+		int i = y * width + x;
+		if (invW <= depth[i]) {
+			return;
+		}
+		depth[i] = invW;
+		setPixel(x, y, r, g, b);
 	}
 
 	/** Writes one pixel directly into the byte array; out-of-bounds writes are ignored. */

@@ -5,9 +5,10 @@ Java/Swing exercise that draws by writing raw pixels into a framebuffer.
 - **Lines:** `Renderer.drawLine` is a generalized Bresenham writing directly into the framebuffer bytes.
 - **Rotation about an axis:** `Matrix4.rotationAboutAxis(p1, p2, theta)` = `T⁻¹·M⁻¹·R·M·T` (Aula 4).
 - **Camera + perspective:** `Matrix4.lookAt` / `Matrix4.perspective` (Aula 5); `mvp = projection · view · model`.
-- **Demo:** a wireframe cube spins about the red axis p1→p2; fly around with the keyboard.
+- **Rasterization:** `Renderer.fillTriangle` fills every face (barycentric test + z-buffer) with flat shading.
+- **Scene:** five .obj files from `src/assets/obj_1/` (tank, medieval house, MiG-29, bench, chair), read by `ObjLoader`, on a floor grid with X/Y/Z axes at the centre.
 
-Controls: `W`/`S` forward/back, `A`/`D` strafe, `Q`/`E` down/up, `←`/`→` orbit.
+Controls (they move the camera): `W`/`S` forward/back, `A`/`D` strafe, `Q`/`E` down/up, `←`/`→` orbit the scene centre, `↑`/`↓` raise/lower the camera around it.
 
 See [DOCUMENTACAO.md](DOCUMENTACAO.md) for the architecture and every class/function.
 

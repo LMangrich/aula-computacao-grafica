@@ -26,8 +26,5 @@ public class Scene {
 
 	public void update(long diftime) {
 		camera.update(diftime, keyboard);
-		for (SceneObject o : objects) {
-			o.update(diftime);
-		}
 	}
 }

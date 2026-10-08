@@ -12,7 +12,7 @@ import engine.GameCanvas;
  * and starts the game loop.
  */
 public class MainClass {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws java.io.IOException {
 		GameCanvas meuCanvas = new GameCanvas(); //drawing surface
 
 		JFrame f = new JFrame(); // window shell -- botões principais close/minimize/etc
