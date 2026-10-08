@@ -20,25 +20,18 @@ public class Framebuffer {
 		this.pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
 	}
 
+	/** Fills the whole buffer with opaque white. */
 	public void clear() {
 		for (int i = 0; i < pixels.length; i++) {
-			pixels[i] = 0;
+			pixels[i] = (byte) 255;
 		}
 	}
 
-	public void fill(int a, int b, int g, int r) {
-		for (int j = 0; j < height; j++) {
-			for (int i = 0; i < width; i++) {
-				int pos = i * 4 + width * 4 * j;
-				pixels[pos] = (byte) a;
-				pixels[pos + 1] = (byte) b;
-				pixels[pos + 2] = (byte) g;
-				pixels[pos + 3] = (byte) r;
-			}
-		}
-	}
-
+	/** Writes one pixel directly into the byte array; out-of-bounds writes are ignored. */
 	public void setPixel(int x, int y, int r, int g, int b) {
+		if (x < 0 || x >= width || y < 0 || y >= height) {
+			return;
+		}
 		int pospix = y * (width * 4) + x * 4;
 		pixels[pospix] = (byte) 255;
 		pixels[pospix + 1] = (byte) (b & 0xff);

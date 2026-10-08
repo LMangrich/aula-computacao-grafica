@@ -1,73 +1,43 @@
 package world;
 
-import java.util.Random;
-
-import input.KeyboardInput;
-import input.MouseInput;
+import math.Matrix4;
 
 /**
- * Holds every piece of simulation state (sprite position, colour filter, the
- * two tracked points) and advances it one tick at a time from the current
- * input snapshot.
+ * Simulation state: a cube spinning about an arbitrary axis defined by two
+ * points, p1 and p2.
  */
 public class World {
-	public float posx = 0;
-	public float posy = 0;
+	public final double[] p1 = { 200, 380, -60 };
+	public final double[] p2 = { 440, 100, 60 };
 
-	public float filtroR = 1;
-	public float filtroG = 1;
-	public float filtroB = 1;
+	/** Cube edges as pairs of indices into {@link #vertices}. */
+	public static final int[][] EDGES = {
+			{ 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 },
+			{ 4, 5 }, { 5, 6 }, { 6, 7 }, { 7, 4 },
+			{ 0, 4 }, { 1, 5 }, { 2, 6 }, { 3, 7 } };
 
-	public float q1x = 10, q1y = 100;
-	public float q2x = 10, q2y = 200;
+	private final double[][] base = new double[8][];
+	public final double[][] vertices = new double[8][];
 
-	private int timer = 0;
-	private final Random rand = new Random();
-	private boolean settingFirstPoint = true;
+	private double angle = 0;
 
-	private final KeyboardInput keyboard;
-	private final MouseInput mouse;
-
-	public World(KeyboardInput keyboard, MouseInput mouse) {
-		this.keyboard = keyboard;
-		this.mouse = mouse;
+	public World() {
+		double cx = 320, cy = 240, h = 80;
+		int i = 0;
+		for (double z : new double[] { -h, h }) {
+			for (double[] xy : new double[][] { { -h, -h }, { h, -h }, { h, h }, { -h, h } }) {
+				base[i++] = new double[] { cx + xy[0], cy + xy[1], z };
+			}
+		}
+		update(0);
 	}
 
 	public void update(long diftime) {
-		float difS = diftime / 1000.0f;
-		float vel = 50;
+		angle += Math.toRadians(90) * diftime / 1000.0;
 
-		timer += diftime;
-		if (timer >= 1000) {
-			timer = 0;
-			filtroR = rand.nextFloat();
-			filtroG = rand.nextFloat();
-			filtroB = rand.nextFloat();
-		}
-
-		if (keyboard.up) {
-			posy -= vel * difS;
-		}
-		if (keyboard.down) {
-			posy += vel * difS;
-		}
-		if (keyboard.left) {
-			posx -= vel * difS;
-		}
-		if (keyboard.right) {
-			posx += vel * difS;
-		}
-
-		// First click sets (x1,y1), next click sets (x2,y2), then it loops back.
-		if (mouse.consumeClick()) {
-			if (settingFirstPoint) {
-				q1x = mouse.clickX;
-				q1y = mouse.clickY;
-			} else {
-				q2x = mouse.clickX;
-				q2y = mouse.clickY;
-			}
-			settingFirstPoint = !settingFirstPoint;
+		Matrix4 rotation = Matrix4.rotationAboutAxis(p1, p2, angle);
+		for (int i = 0; i < base.length; i++) {
+			vertices[i] = rotation.transform(base[i][0], base[i][1], base[i][2]);
 		}
 	}
 }
