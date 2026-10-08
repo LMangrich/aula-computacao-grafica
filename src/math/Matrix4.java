@@ -23,6 +23,44 @@ public class Matrix4 {
 		return r;
 	}
 
+	public static Matrix4 scale(double a, double b, double c) {
+		Matrix4 r = identity();
+		r.m[0][0] = a;
+		r.m[1][1] = b;
+		r.m[2][2] = c;
+		return r;
+	}
+
+	/**
+	 * World -> viewing coordinates (Aula 5): zv = N = (eye - target) normalised,
+	 * xv = (V x N) normalised, yv = zv x xv; M = R * T.
+	 */
+	public static Matrix4 lookAt(double[] eye, double[] target, double[] up) {
+		double[] zv = normalize(sub(eye, target));
+		double[] xv = normalize(cross(up, zv));
+		double[] yv = cross(zv, xv);
+
+		Matrix4 r = identity();
+		for (int j = 0; j < 3; j++) {
+			r.m[0][j] = xv[j];
+			r.m[1][j] = yv[j];
+			r.m[2][j] = zv[j];
+		}
+		return r.multiply(translation(-eye[0], -eye[1], -eye[2]));
+	}
+
+	/**
+	 * Perspective projection (Aula 5, slide 25) for a camera at the origin looking
+	 * down -Z, with the projection plane at distance d. After the homogeneous
+	 * divide: xp = d*x/depth, yp = d*y/depth, where depth = -z.
+	 */
+	public static Matrix4 perspective(double d) {
+		Matrix4 mper = identity();
+		mper.m[2][2] = 0;
+		mper.m[3][2] = 1 / d;
+		return mper.multiply(translation(0, 0, -d)).multiply(scale(1, 1, -1));
+	}
+
 	/** Counter-clockwise rotation about the Z axis (Rz of the lecture). */
 	public static Matrix4 rotationZ(double theta) {
 		Matrix4 r = identity();
@@ -63,6 +101,15 @@ public class Matrix4 {
 	public double[] transform(double x, double y, double z) {
 		double[] out = new double[3];
 		for (int i = 0; i < 3; i++) {
+			out[i] = m[i][0] * x + m[i][1] * y + m[i][2] * z + m[i][3];
+		}
+		return out;
+	}
+
+	/** Transforms (x, y, z, 1) and returns {x, y, z, w} without dividing by w. */
+	public double[] transformHomogeneous(double x, double y, double z) {
+		double[] out = new double[4];
+		for (int i = 0; i < 4; i++) {
 			out[i] = m[i][0] * x + m[i][1] * y + m[i][2] * z + m[i][3];
 		}
 		return out;
