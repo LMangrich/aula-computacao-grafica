@@ -54,13 +54,13 @@ public class GameCanvas extends JPanel implements Runnable {
 				double[] v = o.mesh.vertices[i];
 				screen[i] = toScreen(mvp.transformHomogeneous(v[0], v[1], v[2]));
 			}
-			for (int[] e : o.mesh.edges) {
-				drawSegment(screen[e[0]], screen[e[1]], 0, 0, 0);
-			}
+			// for (int[] e : o.mesh.edges) {
+			// 	drawSegment(screen[e[0]], screen[e[1]], 0, 0, 0);
+			// }
 
 			// Rotation axis (world space), drawn in red.
-			drawSegment(toScreen(viewProj.transformHomogeneous(o.axisP1[0], o.axisP1[1], o.axisP1[2])),
-					toScreen(viewProj.transformHomogeneous(o.axisP2[0], o.axisP2[1], o.axisP2[2])), 255, 0, 0);
+			// drawSegment(toScreen(viewProj.transformHomogeneous(o.axisP1[0], o.axisP1[1], o.axisP1[2])),
+					// toScreen(viewProj.transformHomogeneous(o.axisP2[0], o.axisP2[1], o.axisP2[2])), 255, 0, 0);
 		}
 
 		g.drawImage(framebuffer.image, 0, 0, null);
@@ -74,13 +74,13 @@ public class GameCanvas extends JPanel implements Runnable {
 		return new double[] { W / 2.0 + p[0] / p[3], H / 2.0 - p[1] / p[3] };
 	}
 
-	private void drawSegment(double[] a, double[] b, int r, int g, int bl) {
-		if (a == null || b == null) {
-			return;
-		}
-		renderer.drawLine((int) Math.round(a[0]), (int) Math.round(a[1]),
-				(int) Math.round(b[0]), (int) Math.round(b[1]), r, g, bl);
-	}
+	// private void drawSegment(double[] a, double[] b, int r, int g, int bl) {
+	// 	if (a == null || b == null) {
+	// 		return;
+	// 	}
+	// 	renderer.drawLine((int) Math.round(a[0]), (int) Math.round(a[1]),
+	// 			(int) Math.round(b[0]), (int) Math.round(b[1]), r, g, bl);
+	// }
 
 	public void start() {
 		new Thread(this).start();

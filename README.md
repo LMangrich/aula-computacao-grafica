@@ -15,6 +15,14 @@ See [DOCUMENTACAO.md](DOCUMENTACAO.md) for the architecture and every class/func
 
 JDK 8+; run from the project root.
 
+**Linux / macOS / Git Bash:**
+
 ```bash
 javac -d bin $(find src -name '*.java') && java -cp bin app.MainClass
+```
+
+**Windows** (PowerShell 5.1 has no `&&`, and `find` is a different Windows tool): just run the script, or double-click it.
+
+```powershell
+.\run.bat
 ```

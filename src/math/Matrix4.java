@@ -4,10 +4,10 @@ package math;
  * 4x4 matrix in homogeneous coordinates (column-vector convention, P' = M * P),
  * as in the 3D transformation lecture. Only what the axis rotation needs.
  */
-public class Matrix4 {
+public class Matrix4 { //matrix 4x4 para utilizar a multiplocação de matrizes e fazer as transformações de rotação, translação e escala
 	public final double[][] m = new double[4][4];
 
-	public static Matrix4 identity() {
+	public static Matrix4 identity() { //matriz identidade, que não altera o vetor quando multiplicada
 		Matrix4 r = new Matrix4();
 		for (int i = 0; i < 4; i++) {
 			r.m[i][i] = 1;
@@ -15,26 +15,22 @@ public class Matrix4 {
 		return r;
 	}
 
-	public static Matrix4 translation(double tx, double ty, double tz) {
+	public static Matrix4 translation(double tx, double ty, double tz) { //matriz de translação, apenas gera uma nova matriz, nao move
 		Matrix4 r = identity();
-		r.m[0][3] = tx;
+		r.m[0][3] = tx; //usa apenas a coluna 3 
 		r.m[1][3] = ty;
 		r.m[2][3] = tz;
 		return r;
 	}
 
-	public static Matrix4 scale(double a, double b, double c) {
+	public static Matrix4 scale(double a, double b, double c) { //matriz de escala, apenas gera uma nova matriz com os numeros especificados, nao cria nenhuma escala nova
 		Matrix4 r = identity();
-		r.m[0][0] = a;
+		r.m[0][0] = a; //usa apenas a coluna diagonal
 		r.m[1][1] = b;
 		r.m[2][2] = c;
 		return r;
 	}
 
-	/**
-	 * World -> viewing coordinates (Aula 5): zv = N = (eye - target) normalised,
-	 * xv = (V x N) normalised, yv = zv x xv; M = R * T.
-	 */
 	public static Matrix4 lookAt(double[] eye, double[] target, double[] up) {
 		double[] zv = normalize(sub(eye, target));
 		double[] xv = normalize(cross(up, zv));
@@ -49,25 +45,19 @@ public class Matrix4 {
 		return r.multiply(translation(-eye[0], -eye[1], -eye[2]));
 	}
 
-	/**
-	 * Perspective projection (Aula 5, slide 25) for a camera at the origin looking
-	 * down -Z, with the projection plane at distance d. After the homogeneous
-	 * divide: xp = d*x/depth, yp = d*y/depth, where depth = -z.
-	 */
 	public static Matrix4 perspective(double d) {
 		Matrix4 mper = identity();
-		mper.m[2][2] = 0;
+		mper.m[2][2] = 0; // coluna 2, linha 2 e 3
 		mper.m[3][2] = 1 / d;
 		return mper.multiply(translation(0, 0, -d)).multiply(scale(1, 1, -1));
 	}
 
-	/** Counter-clockwise rotation about the Z axis (Rz of the lecture). */
-	public static Matrix4 rotationZ(double theta) {
+	public static Matrix4 rotationZ(double theta) { // matriz de rotação em torno do eixo Z, apenas gera uma nova matriz com os numeros especificados, nao cria nenhuma rotação nova
 		Matrix4 r = identity();
 		double c = Math.cos(theta);
 		double s = Math.sin(theta);
 		r.m[0][0] = c;
-		r.m[0][1] = -s;
+		r.m[0][1] = -s; //usa um bloco 2x2 pra rotação, sendo top-left
 		r.m[1][0] = s;
 		r.m[1][1] = c;
 		return r;
@@ -115,18 +105,9 @@ public class Matrix4 {
 		return out;
 	}
 
-	/**
-	 * Rotation by theta about the axis through p1 and p2:
-	 * P' = T^-1 * M^-1 * R * M * T * P.
-	 * <ol>
-	 * <li>T: move p1 to the origin.</li>
-	 * <li>M: rows U, V, W (orthonormal, W along the axis), so the axis maps to Z.</li>
-	 * <li>R: rotate by theta about Z.</li>
-	 * <li>M^-1 = M^T: back to the original orientation.</li>
-	 * <li>T^-1: move back to p1.</li>
-	 * </ol>
-	 */
 	public static Matrix4 rotationAboutAxis(double[] p1, double[] p2, double theta) {
+		// subtrai o ponto inicial do final, normaliza (tornando o comprimento 1)
+		// e pega o vetor unitario, que eh a direcao do eixo de rotacao
 		// W = s / |s|, with s = p2 - p1
 		double[] w = normalize(sub(p2, p1));
 

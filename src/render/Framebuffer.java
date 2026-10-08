@@ -10,13 +10,15 @@ import java.awt.image.DataBufferByte;
 public class Framebuffer {
 	public final int width;
 	public final int height;
-	public final BufferedImage image;
-	public final byte[] pixels;
+	public final BufferedImage image; // imagem que vai ser desenhada na tela, eh o que a jframe vai mostrar
+	public final byte[] pixels; // visão direta da imagem, para escrever diretamente na memoria de video
 
 	public Framebuffer(int width, int height) {
 		this.width = width;
 		this.height = height;
+		// TYPE_4BYTE_ABGR: 4 bytes por pixel, alpha, blue, green, red
 		this.image = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
+		// pega a visão direta da imagem, para escrever diretamente na memoria de video
 		this.pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
 	}
 
@@ -29,13 +31,18 @@ public class Framebuffer {
 
 	/** Writes one pixel directly into the byte array; out-of-bounds writes are ignored. */
 	public void setPixel(int x, int y, int r, int g, int b) {
+		// controla o out-of-bounds, para nao escrever fora da memoria de video (0,0) -> eh o top-left
 		if (x < 0 || x >= width || y < 0 || y >= height) {
 			return;
 		}
+
+		// calcula a posição do pixel na memoria de video, considerando q cada pixel tem 4 bytes
 		int pospix = y * (width * 4) + x * 4;
-		pixels[pospix] = (byte) 255;
-		pixels[pospix + 1] = (byte) (b & 0xff);
-		pixels[pospix + 2] = (byte) (g & 0xff);
-		pixels[pospix + 3] = (byte) (r & 0xff);
+
+		// escreve os 4 bytes do pixel na memoria de video, na ordem ABGR
+		pixels[pospix] = (byte) 255; // alpha: 255 = opaque, 0 = transparent
+		pixels[pospix + 1] = (byte) (b & 0xff); // & 0xff: garante q o valor esteja entre 0 e 255, azul
+		pixels[pospix + 2] = (byte) (g & 0xff); // & 0xff: garante q o valor esteja entre 0 e 255, verde
+		pixels[pospix + 3] = (byte) (r & 0xff); // & 0xff: garante q o valor esteja entre 0 e 255, vermelho
 	}
 }

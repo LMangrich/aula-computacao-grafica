@@ -5,7 +5,8 @@ import java.awt.event.KeyListener;
 
 /** Reduces AWT key events to pollable booleans. */
 public class KeyboardInput implements KeyListener {
-	public volatile boolean w, a, s, d, q, e, left, right;
+	public volatile boolean w, a, s, d, q, e, left, right; //volatile: garante q a thread de renderizacao vai ver o valor atualizado
+	//synchronized funciona tb mas eh mais pesada 
 
 	@Override
 	public void keyPressed(KeyEvent ev) {
@@ -23,7 +24,7 @@ public class KeyboardInput implements KeyListener {
 
 	private void set(int code, boolean v) {
 		switch (code) {
-		case KeyEvent.VK_W: w = v; break;
+		case KeyEvent.VK_W: w = v; break; //detecta ql tecla foi pressionada e seta a variavel correspondente
 		case KeyEvent.VK_A: a = v; break;
 		case KeyEvent.VK_S: s = v; break;
 		case KeyEvent.VK_D: d = v; break;
