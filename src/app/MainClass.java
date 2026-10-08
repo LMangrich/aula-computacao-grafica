@@ -12,21 +12,21 @@ import engine.GameCanvas;
  * and starts the game loop.
  */
 public class MainClass {
-	public static void main(String[] args) {
-		GameCanvas meuCanvas = new GameCanvas();
+	public static void main(String[] args) throws java.io.IOException {
+		GameCanvas meuCanvas = new GameCanvas(); //drawing surface
 
-		JFrame f = new JFrame();
-		f.setSize(640, 480);
-		f.setVisible(true);
-		f.getContentPane().add(meuCanvas);
+		JFrame f = new JFrame(); // window shell -- botões principais close/minimize/etc
+		f.setSize(640, 480); // window size in pixels
+		f.setVisible(true); // faz aparecer na tela
+		f.getContentPane().add(meuCanvas); // adiciona o canvas na janela
 
 		f.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				System.exit(0);
+				System.exit(0); // encerra o programa qnd eh fechado
 			}
 		});
 
-		meuCanvas.start();
+		meuCanvas.start(); // inicia o loop 
 	}
 }
