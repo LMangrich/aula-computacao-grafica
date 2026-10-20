@@ -1,29 +1,17 @@
 package aula;
 
-import org.lwjgl.BufferUtils;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.system.MemoryStack;
 
 import aula.obj.ObjModel;
 import aula.util.TextureLoader;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.nio.file.*;
-import java.util.*;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
 
 import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL15.*;
+import static org.lwjgl.opengl.GL13.*;
 
 public class Main {
 
@@ -47,18 +35,12 @@ public class Main {
 		glClearColor(.5f, .5f, .5f, 1);
 		try {
 			ObjModel mesh = new ObjModel(path.toString());
-			//ObjModel mesh2 = new ObjModel("src/main/resources/models/x-35_obj.obj");
 			
 			System.out.println("mesh "+mesh.drawboundingbox());
-			//System.out.println("mesh "+mesh2.drawboundingbox());
-					
-			BufferedImage img = ImageIO.read(new File("src/main/resources/saida_textura_03___Default.png"));
-			int textureId = TextureLoader.loadTexture(img);
-			BufferedImage img_2 = ImageIO.read(new File("src/main/resources/saida_textura_glass.png"));
-			int textureId2 = TextureLoader.loadTexture(img_2);
 			
+			int textureId = carregaTextura("src/main/resources/saida_textura_03___Default.png");
 			mesh.setMaterialTexture("03___Default",textureId);
-			mesh.setMaterialTexture("glass",textureId2);
+			mesh.setMaterialTexture("glass",carregaTextura("src/main/resources/saida_textura_glass.png"));
 			
 			
 			System.out.println("Vertices renderizados: " + mesh.f.size() + " | OBJ: " + path);
@@ -80,7 +62,6 @@ public class Main {
 				glMatrixMode(GL_PROJECTION);
 				glLoadIdentity();
 				double aspect = (double) w[0] / h[0];
-				//System.out.println("w0 "+w[0]+" h0 "+h[0]);
 				glFrustum(-aspect * .7, aspect * .7, -.7, .7, 1, 100);
 				glMatrixMode(GL_MODELVIEW);
 				
@@ -97,7 +78,6 @@ public class Main {
 				glPolygonMode(GL_FRONT_AND_BACK, glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS ? GL_LINE : GL_FILL);
 				
 				glColor3f(1, 1, 1);
-				//System.out.println("textureId "+textureId);
 				glEnable(GL_COLOR_MATERIAL);
 				glEnable (GL_TEXTURE_2D);
 				glBindTexture(GL_TEXTURE_2D, textureId);
@@ -106,12 +86,6 @@ public class Main {
 				glScaled(0.05f,0.05f,0.05f);
 				mesh.draw();
 				
-				//glTranslatef(0, 0, -6);
-				
-				//glBindTexture(GL_TEXTURE_2D, textureId2);
-				//glScaled(0.01f,0.01f,0.01f);
-				
-				//mesh2.draw();
 				glfwSwapBuffers(window);
 				glfwPollEvents();
 			}
@@ -119,5 +93,9 @@ public class Main {
 			glfwDestroyWindow(window);
 			glfwTerminate();
 		}
+	}
+	
+	static int carregaTextura(String arquivo) throws IOException {
+		return TextureLoader.loadTexture(ImageIO.read(new File(arquivo)));
 	}
 }
