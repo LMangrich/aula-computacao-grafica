@@ -1,10 +1,10 @@
 package aula.obj;
 
 public class Face3D {
-	byte nvertices = 0;
-	int v[] = new int[4];
+	public byte nvertices = 0;
+	public int v[] = new int[4];
 
-	int n[] = new int[4];
-	
-	int t[] = new int[4];
+	public int n[] = new int[4];
+
+	public int t[] = new int[4];
 }
