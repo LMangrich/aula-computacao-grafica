@@ -52,23 +52,65 @@ public class Md2Model extends Model {
 	}
 
     void drawInterpolated(int a, int b, float t) { // desenha uma pose entre o frame a e o frame b
+		Vector3f[] pose = new Vector3f[frames[a].vertices.length]; // posição misturada de cada vértice nesta pose
+		for (int i = 0; i < pose.length; i++) {
+			Vector3f pa = frames[a].vertices[i]; // posição do vértice i no frame a
+			Vector3f pb = frames[b].vertices[i]; // posição do mesmo vértice no frame b
+			pose[i] = new Vector3f(
+				pa.x + t * (pb.x - pa.x), // A + t * (B - A), para cada coordenada
+				pa.y + t * (pb.y - pa.y),
+				pa.z + t * (pb.z - pa.z));
+		}
+
+		Vector3f[] normais = calculaNormais(pose); // normal de cada vértice nesta pose, já normalizada
+
 		glColor3f(1f, 1f, 1f); // branco: não altera as cores da textura
 		glBegin(GL_TRIANGLES); // cada 3 vértices formam um triângulo
 		for (Face3D tri : triangles) { // percorre os 392 triângulos
 			for (int k = 0; k < 3; k++) { // os 3 cantos do triângulo
 				Vector2f uv = texCoords.get(tri.t[k]); // coordenada de textura deste canto
-                Vector3f pa = frames[a].vertices[tri.v[k]]; // posição do vértice no frame a
-                Vector3f pb = frames[b].vertices[tri.v[k]]; // posição do mesmo vértice no frame b
-
-				float x = pa.x + t * (pb.x - pa.x); // A + t * (B - A), para cada coordenada
-				float y = pa.y + t * (pb.y - pa.y);
-				float z = pa.z + t * (pb.z - pa.z);
+				Vector3f n = normais[tri.v[k]]; // normal deste vértice
+				Vector3f p = pose[tri.v[k]]; // posição deste vértice
 
 				glTexCoord2f(uv.x, uv.y); // ponto da skin que vai neste vértice (não muda entre frames)
-				glVertex3f(x, y, z); // posição misturada entre os dois frames
+				glNormal3f(n.x, n.y, n.z); // normal normalizada, igual ao desenhaFaces do ObjModel
+				glVertex3f(p.x, p.y, p.z); // posição misturada entre os dois frames
 			}
 		}
 		glEnd(); // fim dos triângulos
+	}
+
+	// soma a normal de cada triângulo nos seus 3 vértices e depois normaliza (o MD2 não traz normais prontas)
+	Vector3f[] calculaNormais(Vector3f[] pose) {
+		Vector3f[] normais = new Vector3f[pose.length];
+		for (int i = 0; i < normais.length; i++) {
+			normais[i] = new Vector3f(); // começa zerada
+		}
+
+		for (Face3D tri : triangles) {
+			Vector3f p0 = pose[tri.v[0]];
+			Vector3f p1 = pose[tri.v[1]];
+			Vector3f p2 = pose[tri.v[2]];
+
+			// produto vetorial (p1 - p0) x (p2 - p0) = normal da face
+			float ux = p1.x - p0.x, uy = p1.y - p0.y, uz = p1.z - p0.z;
+			float vx = p2.x - p0.x, vy = p2.y - p0.y, vz = p2.z - p0.z;
+			float nx = uy * vz - uz * vy;
+			float ny = uz * vx - ux * vz;
+			float nz = ux * vy - uy * vx;
+
+			for (int k = 0; k < 3; k++) { // soma nos 3 vértices do triângulo
+				Vector3f n = normais[tri.v[k]];
+				n.x += nx;
+				n.y += ny;
+				n.z += nz;
+			}
+		}
+
+		for (Vector3f n : normais) {
+			n.Normalize(); // deixa cada normal com tamanho 1, como vn.get(...).Normalize() no ObjModel
+		}
+		return normais;
 	}
 
 	public void setAnimation(String name) { // escolhe a animação pelo nome: "stand", "run", "attack"...
